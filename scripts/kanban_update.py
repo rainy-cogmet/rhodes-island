@@ -4,23 +4,23 @@
 
 用法:
   # 新建任务（收旨时）
-  python3 kanban_update.py create JJC-20260223-012 "任务标题" Zhongshu 中书省 中书令
+  python3 kanban_update.py create RHI-20260223-012 "任务标题" Theresia 特蕾西娅 精神领袖
 
   # 更新状态
-  python3 kanban_update.py state JJC-20260223-012 Menxia "规划方案已提交门下省"
+  python3 kanban_update.py state RHI-20260223-012 Kaltsit "规划方案已提交凯尔希"
 
   # 添加流转记录
-  python3 kanban_update.py flow JJC-20260223-012 "中书省" "门下省" "规划方案提交审核"
+  python3 kanban_update.py flow RHI-20260223-012 "特蕾西娅" "凯尔希" "规划方案提交审核"
 
   # 完成任务
-  python3 kanban_update.py done JJC-20260223-012 "/path/to/output" "任务完成摘要"
+  python3 kanban_update.py done RHI-20260223-012 "/path/to/output" "任务完成摘要"
 
   # 添加/更新子任务 todo
-  python3 kanban_update.py todo JJC-20260223-012 1 "实现API接口" in-progress
-  python3 kanban_update.py todo JJC-20260223-012 1 "" completed
+  python3 kanban_update.py todo RHI-20260223-012 1 "实现API接口" in-progress
+  python3 kanban_update.py todo RHI-20260223-012 1 "" completed
 
   # 🔥 实时进展汇报（Agent 主动调用，频率不限）
-  python3 kanban_update.py progress JJC-20260223-012 "正在分析需求，拟定3个子方案" "1.调研技术选型|2.撰写设计文档|3.实现原型"
+  python3 kanban_update.py progress RHI-20260223-012 "正在分析需求，拟定3个子方案" "1.调研技术选型|2.撰写设计文档|3.实现原型"
 """
 import json, pathlib, datetime, sys, subprocess, logging, os, re
 
@@ -35,30 +35,30 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(name)s] %(message
 from file_lock import atomic_json_read, atomic_json_update, atomic_json_write  # noqa: E402
 
 STATE_ORG_MAP = {
-    'Taizi': '太子', 'Zhongshu': '中书省', 'Menxia': '门下省', 'Assigned': '尚书省',
-    'Doing': '执行中', 'Review': '尚书省', 'Done': '完成', 'Blocked': '阻塞',
+    'Amiya': '阿米娅', 'Theresia': '特蕾西娅', 'Kaltsit': '凯尔希', 'Assigned': 'Mon3tr',
+    'Doing': '执行中', 'Review': 'Mon3tr', 'Done': '完成', 'Blocked': '阻塞',
 }
 
 _STATE_AGENT_MAP = {
-    'Taizi': 'main',
-    'Zhongshu': 'zhongshu',
-    'Menxia': 'menxia',
-    'Assigned': 'shangshu',
-    'Review': 'shangshu',
-    'Pending': 'zhongshu',
+    'Amiya': 'main',
+    'Theresia': 'theresis',
+    'Kaltsit': 'kaltsit',
+    'Assigned': 'Mon3tr',
+    'Review': 'Mon3tr',
+    'Pending': 'theresis',
 }
 
 _ORG_AGENT_MAP = {
-    '礼部': 'libu', '户部': 'hubu', '兵部': 'bingbu',
-    '刑部': 'xingbu', '工部': 'gongbu', '吏部': 'libu_hr',
-    '中书省': 'zhongshu', '门下省': 'menxia', '尚书省': 'shangshu',
+    '赫墨': 'Silence', '可露希尔': 'Closure', '逻各斯': 'Logos',
+    '塞雷娅': 'Saria', '德克萨斯': 'Texas', '华法林': 'warfarin',
+    '特蕾西娅': 'theresis', '凯尔希': 'kaltsit', 'Mon3tr': 'Mon3tr',
 }
 
 _AGENT_LABELS = {
-    'main': '太子', 'taizi': '太子',
-    'zhongshu': '中书省', 'menxia': '门下省', 'shangshu': '尚书省',
-    'libu': '礼部', 'hubu': '户部', 'bingbu': '兵部', 'xingbu': '刑部',
-    'gongbu': '工部', 'libu_hr': '吏部', 'zaochao': '钦天监',
+    'main': '阿米娅', 'amiya': '阿米娅',
+    'theresis': '特蕾西娅', 'kaltsit': '凯尔希', 'Mon3tr': 'Mon3tr',
+    'Silence': '赫墨', 'Closure': '可露希尔', 'Logos': '逻各斯', 'Saria': '塞雷娅',
+    'Texas': '德克萨斯', 'warfarin': '华法林', 'Exusiai': '能天使',
 }
 
 MAX_PROGRESS_LOG = 100  # 单任务最大进展日志条数
@@ -194,9 +194,9 @@ def cmd_create(task_id, title, state, org, official, remark=None):
         tasks.insert(0, {
             "id": task_id, "title": title, "official": official,
             "org": actual_org, "state": state,
-            "now": clean_remark[:60] if remark else f"已下旨，等待{actual_org}接旨",
+            "now": clean_remark[:60] if remark else f"已下达任务，等待{actual_org}接收",
             "eta": "-", "block": "无", "output": "", "ac": "",
-            "flow_log": [{"at": now_iso(), "from": "皇上", "to": actual_org, "remark": clean_remark}],
+            "flow_log": [{"at": now_iso(), "from": "博士", "to": actual_org, "remark": clean_remark}],
             "updatedAt": now_iso()
         })
         return tasks
@@ -256,7 +256,7 @@ def cmd_done(task_id, output_path='', summary=''):
         t['now'] = summary or '任务已完成'
         t.setdefault('flow_log', []).append({
             "at": now_iso(), "from": t.get('org', '执行部门'),
-            "to": "皇上", "remark": f"✅ 完成：{summary or '任务已完成'}"
+            "to": "博士", "remark": f"✅ 完成：{summary or '任务已完成'}"
         })
         t['updatedAt'] = now_iso()
         return tasks

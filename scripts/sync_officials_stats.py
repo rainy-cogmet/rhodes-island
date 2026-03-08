@@ -23,17 +23,17 @@ MODEL_PRICING = {
 }
 
 OFFICIALS = [
-    {'id':'taizi',   'label':'太子',  'role':'太子',    'emoji':'🤴','rank':'储君'},
-    {'id':'zhongshu','label':'中书省','role':'中书令',  'emoji':'📜','rank':'正一品'},
-    {'id':'menxia',  'label':'门下省','role':'侍中',    'emoji':'🔍','rank':'正一品'},
-    {'id':'shangshu','label':'尚书省','role':'尚书令',  'emoji':'📮','rank':'正一品'},
-    {'id':'libu',    'label':'礼部',  'role':'礼部尚书','emoji':'📝','rank':'正二品'},
-    {'id':'hubu',    'label':'户部',  'role':'户部尚书','emoji':'💰','rank':'正二品'},
-    {'id':'bingbu',  'label':'兵部',  'role':'兵部尚书','emoji':'⚔️','rank':'正二品'},
-    {'id':'xingbu',  'label':'刑部',  'role':'刑部尚书','emoji':'⚖️','rank':'正二品'},
-    {'id':'gongbu',  'label':'工部',  'role':'工部尚书','emoji':'🔧','rank':'正二品'},
-    {'id':'libu_hr', 'label':'吏部',  'role':'吏部尚书','emoji':'👔','rank':'正二品'},
-    {'id':'zaochao', 'label':'钦天监','role':'朝报官',  'emoji':'📰','rank':'正三品'},
+    {'id':'amiya',    'label':'阿米娅',    'role':'罗德岛领袖',  'emoji':'🐰','rank':'领袖'},
+    {'id':'theresis', 'label':'特蕾西娅',  'role':'精神领袖',    'emoji':'👑','rank':'领袖'},
+    {'id':'kaltsit',  'label':'凯尔希',    'role':'医疗负责人',  'emoji':'🩺','rank':'领袖'},
+    {'id':'Mon3tr',   'label':'Mon3tr',    'role':'特别顾问',    'emoji':'🦎','rank':'核心'},
+    {'id':'Closure',  'label':'可露希尔',  'role':'采购负责人',  'emoji':'🛒','rank':'干部'},
+    {'id':'Silence',  'label':'赫墨',      'role':'研究员',      'emoji':'🕊️','rank':'干部'},
+    {'id':'Logos',    'label':'逻各斯',    'role':'精英术士',    'emoji':'📜','rank':'精英'},
+    {'id':'Saria',    'label':'塞雷娅',    'role':'防卫部长',    'emoji':'🛡️','rank':'精英'},
+    {'id':'Texas',    'label':'德克萨斯',  'role':'高效干员',    'emoji':'🗡️','rank':'精英'},
+    {'id':'warfarin', 'label':'华法林',    'role':'医疗研究员',  'emoji':'🌙','rank':'干部'},
+    {'id':'Exusiai',  'label':'能天使',    'role':'企鹅物流',    'emoji':'💥','rank':'精英'},
 ]
 
 def rj(p, d):
@@ -64,8 +64,8 @@ def get_model(agent_id):
     for a in cfg.get('agents',{}).get('list',[]):
         if a.get('id') == agent_id:
             return normalize_model(a.get('model', default), default)
-    # 兼容历史：太子曾使用 main 作为运行时 id
-    if agent_id == 'taizi':
+    # 兼容历史：阿米娅曾使用 main 作为运行时 id
+    if agent_id == 'amiya':
         for a in cfg.get('agents',{}).get('list',[]):
             if a.get('id') == 'main':
                 return normalize_model(a.get('model', default), default)
@@ -74,7 +74,7 @@ def get_model(agent_id):
 def scan_agent(agent_id):
     """从 sessions.json 读取 token 统计（累计所有 session）"""
     sj = AGENTS_ROOT / agent_id / 'sessions' / 'sessions.json'
-    if not sj.exists() and agent_id == 'taizi':
+    if not sj.exists() and agent_id == 'amiya':
         sj = AGENTS_ROOT / 'main' / 'sessions' / 'sessions.json'
     if not sj.exists():
         return {'tokens_in':0,'tokens_out':0,'cache_read':0,'cache_write':0,'sessions':0,'last_active':None,'messages':0}
@@ -135,10 +135,10 @@ def get_task_stats(org_label, tasks):
     active = [t for t in tasks if t.get('state') in ('Doing','Review','Assigned') and t.get('org')==org_label]
     fl = sum(1 for t in tasks for f in t.get('flow_log',[])
              if f.get('from')==org_label or f.get('to')==org_label)
-    # 参与的旨意（JJC）列表
+    # 参与的罗德岛任务（RHI）列表
     participated = []
     for t in tasks:
-        if not t['id'].startswith('JJC'): continue
+        if not t['id'].startswith('RHI'): continue
         for f in t.get('flow_log',[]):
             if f.get('from')==org_label or f.get('to')==org_label:
                 if t['id'] not in [x['id'] for x in participated]:

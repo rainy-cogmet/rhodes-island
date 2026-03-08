@@ -42,20 +42,20 @@ def state_from_session(age_ms, aborted):
 
 def detect_official(agent_id):
     mapping = {
-        'main':    ('储君', '太子'),        # legacy id for taizi
-        'taizi':   ('储君', '太子'),
-        'zhongshu': ('中书令', '中书省'),
-        'menxia':  ('侍中', '门下省'),
-        'shangshu': ('尚书令', '尚书省'),
-        'hubu':    ('户部尚书', '户部'),
-        'libu':    ('礼部尚书', '礼部'),
-        'bingbu':  ('兵部尚书', '兵部'),
-        'xingbu':  ('刑部尚书', '刑部'),
-        'gongbu':  ('工部尚书', '工部'),
-        'libu_hr': ('吏部尚书', '吏部'),
-        'zaochao': ('钦天监', '朝报司'),
+        'main':     ('罗德岛领袖', '阿米娅'),        # legacy id for amiya
+        'amiya':    ('罗德岛领袖', '阿米娅'),
+        'theresis': ('精神领袖', '特蕾西娅'),
+        'kaltsit':  ('医疗负责人', '凯尔希'),
+        'Mon3tr':   ('特别顾问', 'Mon3tr'),
+        'Closure':  ('采购负责人', '可露希尔'),
+        'Silence':  ('研究员', '赫墨'),
+        'Logos':    ('精英术士', '逻各斯'),
+        'Saria':    ('防卫部长', '塞雷娅'),
+        'Texas':    ('高效干员', '德克萨斯'),
+        'warfarin': ('医疗研究员', '华法林'),
+        'Exusiai':  ('企鹅物流', '能天使'),
     }
-    return mapping.get(agent_id, ('尚书令', '尚书省'))
+    return mapping.get(agent_id, ('特别顾问', 'Mon3tr'))
 
 
 def load_activity(session_file, limit=12):
@@ -246,7 +246,7 @@ def main():
             except Exception:
                 pass
 
-        # merge manual parallel tasks (用于军机处并行看板展示)
+        # merge manual parallel tasks (用于罗德岛控制中心并行看板展示)
         manual_tasks_file = DATA / 'manual_parallel_tasks.json'
         if manual_tasks_file.exists():
             try:
@@ -267,13 +267,13 @@ def main():
                 deduped.append(t)
         tasks = deduped
 
-        # ── 过滤掉非 JJC 且非活跃的系统会话，防止看板噪音 ──
+        # ── 过滤掉非 RHI 且非活跃的系统会话，防止看板噪音 ──
         # 规则: 仅保留 24小时内更新的活跃会话，且排除 cron/subagent 等纯后台任务
         filtered_tasks = []
         one_day_ago = now_ms - 24 * 3600 * 1000
         for t in tasks:
-            # 始终保留 JJC 任务（如果有的话，虽然这里主要是 OC 任务，但以防万一）
-            if str(t['id']).startswith('JJC'):
+            # 始终保留 RHI 任务（如果有的话，虽然这里主要是 OC 任务，但以防万一）
+            if str(t['id']).startswith('RHI'):
                 filtered_tasks.append(t)
                 continue
             
@@ -304,20 +304,20 @@ def main():
         
         tasks = filtered_tasks
         
-        # ── 保留已有的 JJC-* 旨意任务（不覆盖皇上下旨记录）──
-        # JJC 任务的 now 字段由 Agent 自己通过 kanban_update.py progress 命令主动上报，
+        # ── 保留已有的 RHI-* 罗德岛任务（不覆盖博士下达的任务记录）──
+        # RHI 任务的 now 字段由 Agent 自己通过 kanban_update.py progress 命令主动上报，
         # 不再从会话日志中被动抓取。这里只做合并，不做 activity 映射。
         existing_tasks_file = DATA / 'tasks_source.json'
         if existing_tasks_file.exists():
             try:
                 existing = json.loads(existing_tasks_file.read_text())
-                jjc_existing = [t for t in existing if str(t.get('id', '')).startswith('JJC')]
+                rhi_existing = [t for t in existing if str(t.get('id', '')).startswith('RHI')]
                 
-                # 去掉 tasks 里已有的 JJC（以防重复），再把旨意放到最前面
-                tasks = [t for t in tasks if not str(t.get('id', '')).startswith('JJC')]
-                tasks = jjc_existing + tasks
+                # 去掉 tasks 里已有的 RHI（以防重复），再把罗德岛任务放到最前面
+                tasks = [t for t in tasks if not str(t.get('id', '')).startswith('RHI')]
+                tasks = rhi_existing + tasks
             except Exception as e:
-                log.error(f'merge existing JJC tasks failed: {e}')
+                log.error(f'merge existing RHI tasks failed: {e}')
                 pass
 
         atomic_json_write(DATA / 'tasks_source.json', tasks)

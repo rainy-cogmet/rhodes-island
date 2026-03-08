@@ -1,20 +1,20 @@
 #!/usr/bin/env python3
 """
-三省六部 · Skill 管理工具
+罗德岛体系 · Skill 管理工具
 支持从本地或远程 URL 添加、更新、查看和移除 skills
 
 Usage:
-  python3 scripts/skill_manager.py add-remote --agent zhongshu --name code_review \\
+  python3 scripts/skill_manager.py add-remote --agent theresis --name code_review \\
     --source https://raw.githubusercontent.com/org/skills/main/code_review/SKILL.md \\
     --description "代码审查"
   
   python3 scripts/skill_manager.py list-remote
   
-  python3 scripts/skill_manager.py update-remote --agent zhongshu --name code_review
+  python3 scripts/skill_manager.py update-remote --agent theresis --name code_review
   
-  python3 scripts/skill_manager.py remove-remote --agent zhongshu --name code_review
+  python3 scripts/skill_manager.py remove-remote --agent theresis --name code_review
   
-  python3 scripts/skill_manager.py import-official-hub --agents zhongshu,menxia,shangshu
+  python3 scripts/skill_manager.py import-official-hub --agents theresis,kaltsit,Mon3tr
 """
 import sys
 import json
@@ -227,12 +227,12 @@ OFFICIAL_SKILLS_HUB = {
 }
 
 SKILL_AGENT_MAPPING = {
-    'code_review': ('bingbu', 'xingbu', 'menxia'),
-    'api_design': ('bingbu', 'gongbu', 'menxia'),
-    'security_audit': ('xingbu', 'menxia'),
-    'data_analysis': ('hubu', 'menxia'),
-    'doc_generation': ('libu', 'menxia'),
-    'test_framework': ('gongbu', 'xingbu', 'menxia'),
+    'code_review': ('Logos', 'Saria', 'kaltsit'),
+    'api_design': ('Logos', 'Texas', 'kaltsit'),
+    'security_audit': ('Saria', 'kaltsit'),
+    'data_analysis': ('Closure', 'kaltsit'),
+    'doc_generation': ('Silence', 'kaltsit'),
+    'test_framework': ('Texas', 'Saria', 'kaltsit'),
 }
 
 
@@ -254,7 +254,7 @@ def import_official_hub(agent_ids: list) -> bool:
         # 确定目标 agents
         target_agents = agent_ids
         if not agent_ids:
-            target_agents = SKILL_AGENT_MAPPING.get(skill_name, ['menxia'])
+            target_agents = SKILL_AGENT_MAPPING.get(skill_name, ['kaltsit'])
         
         print(f'\n📥 正在导入 skill: {skill_name}')
         print(f'   目标 agents: {", ".join(target_agents)}')
@@ -279,7 +279,7 @@ def import_official_hub(agent_ids: list) -> bool:
 
 
 def main():
-    parser = argparse.ArgumentParser(description='三省六部 Skill 管理工具', 
+    parser = argparse.ArgumentParser(description='罗德岛体系 Skill 管理工具', 
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
     subparsers = parser.add_subparsers(dest='cmd', help='命令')
     

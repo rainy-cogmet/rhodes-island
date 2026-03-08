@@ -15,18 +15,18 @@ DATA = BASE / 'data'
 OPENCLAW_CFG = pathlib.Path.home() / '.openclaw' / 'openclaw.json'
 
 ID_LABEL = {
-    'taizi':    {'label': '太子',   'role': '太子',     'duty': '飞书消息分拣与回奏',  'emoji': '🤴'},
-    'main':     {'label': '太子',   'role': '太子',     'duty': '飞书消息分拣与回奏',  'emoji': '🤴'},  # 兼容旧配置
-    'zhongshu': {'label': '中书省', 'role': '中书令',   'duty': '起草任务令与优先级',  'emoji': '📜'},
-    'menxia':   {'label': '门下省', 'role': '侍中',     'duty': '审议与退回机制',      'emoji': '🔍'},
-    'shangshu': {'label': '尚书省', 'role': '尚书令',   'duty': '派单与升级裁决',      'emoji': '📮'},
-    'libu':     {'label': '礼部',   'role': '礼部尚书', 'duty': '文档/汇报/规范',      'emoji': '📝'},
-    'hubu':     {'label': '户部',   'role': '户部尚书', 'duty': '资源/预算/成本',      'emoji': '💰'},
-    'bingbu':   {'label': '兵部',   'role': '兵部尚书', 'duty': '应急与巡检',          'emoji': '⚔️'},
-    'xingbu':   {'label': '刑部',   'role': '刑部尚书', 'duty': '合规/审计/红线',      'emoji': '⚖️'},
-    'gongbu':   {'label': '工部',   'role': '工部尚书', 'duty': '工程交付与自动化',    'emoji': '🔧'},
-    'libu_hr':  {'label': '吏部',   'role': '吏部尚书', 'duty': '人事/培训/Agent管理',  'emoji': '👔'},
-    'zaochao':  {'label': '钦天监', 'role': '朝报官',   'duty': '每日新闻采集与简报',  'emoji': '📰'},
+    'amiya':    {'label': '阿米娅',   'role': '罗德岛领袖',   'duty': '飞书消息分拣与回奏',  'emoji': '🐰'},
+    'main':     {'label': '阿米娅',   'role': '罗德岛领袖',   'duty': '飞书消息分拣与回奏',  'emoji': '🐰'},  # 兼容旧配置
+    'theresis': {'label': '特蕾西娅', 'role': '精神领袖',   'duty': '起草任务令与优先级',  'emoji': '👑'},
+    'kaltsit':  {'label': '凯尔希',   'role': '医疗负责人',   'duty': '审议与退回机制',      'emoji': '🩺'},
+    'Mon3tr':   {'label': 'Mon3tr',   'role': '特别顾问',   'duty': '派单与升级裁决',      'emoji': '🦎'},
+    'Closure':  {'label': '可露希尔', 'role': '采购负责人',   'duty': '资源/预算/成本',      'emoji': '🛒'},
+    'Silence':  {'label': '赫墨',     'role': '研究员',     'duty': '文档/汇报/规范',      'emoji': '🕊️'},
+    'Logos':    {'label': '逻各斯',   'role': '精英术士',   'duty': '应急与巡检',          'emoji': '📜'},
+    'Saria':    {'label': '塞雷娅',   'role': '防卫部长',   'duty': '合规/审计/红线',      'emoji': '🛡️'},
+    'Texas':    {'label': '德克萨斯', 'role': '高效干员',   'duty': '工程交付与自动化',    'emoji': '🗡️'},
+    'warfarin': {'label': '华法林',   'role': '医疗研究员', 'duty': '人事/培训/Agent管理',  'emoji': '🌙'},
+    'Exusiai':  {'label': '能天使',   'role': '企鹅物流',   'duty': '每日新闻采集与简报',  'emoji': '💥'},
 }
 
 KNOWN_MODELS = [
@@ -112,14 +112,14 @@ def main():
 
     # 补充不在 openclaw.json agents list 中的 agent（兼容旧版 main）
     EXTRA_AGENTS = {
-        'taizi':   {'model': default_model, 'workspace': str(pathlib.Path.home() / '.openclaw/workspace-taizi'),
-                    'allowAgents': ['zhongshu']},
+        'amiya':   {'model': default_model, 'workspace': str(pathlib.Path.home() / '.openclaw/workspace-amiya'),
+                    'allowAgents': ['theresis']},
         'main':    {'model': default_model, 'workspace': str(pathlib.Path.home() / '.openclaw/workspace-main'),
-                    'allowAgents': ['zhongshu','menxia','shangshu','hubu','libu','bingbu','xingbu','gongbu','libu_hr']},
-        'zaochao': {'model': default_model, 'workspace': str(pathlib.Path.home() / '.openclaw/workspace-zaochao'),
+                    'allowAgents': ['theresis','kaltsit','Mon3tr','Closure','Silence','Logos','Saria','Texas','warfarin']},
+        'Exusiai': {'model': default_model, 'workspace': str(pathlib.Path.home() / '.openclaw/workspace-Exusiai'),
                     'allowAgents': []},
-        'libu_hr': {'model': default_model, 'workspace': str(pathlib.Path.home() / '.openclaw/workspace-libu_hr'),
-                    'allowAgents': ['shangshu']},
+        'warfarin': {'model': default_model, 'workspace': str(pathlib.Path.home() / '.openclaw/workspace-warfarin'),
+                    'allowAgents': ['Mon3tr']},
     }
     for ag_id, extra in EXTRA_AGENTS.items():
         if ag_id in seen_ids or ag_id not in ID_LABEL:
@@ -154,17 +154,17 @@ def main():
 
 # 项目 agents/ 目录名 → 运行时 agent_id 映射
 _SOUL_DEPLOY_MAP = {
-    'taizi': 'taizi',
-    'zhongshu': 'zhongshu',
-    'menxia': 'menxia',
-    'shangshu': 'shangshu',
-    'libu': 'libu',
-    'hubu': 'hubu',
-    'bingbu': 'bingbu',
-    'xingbu': 'xingbu',
-    'gongbu': 'gongbu',
-    'libu_hr': 'libu_hr',
-    'zaochao': 'zaochao',
+    'amiya': 'amiya',
+    'theresis': 'theresis',
+    'kaltsit': 'kaltsit',
+    'Mon3tr': 'Mon3tr',
+    'Closure': 'Closure',
+    'Silence': 'Silence',
+    'Logos': 'Logos',
+    'Saria': 'Saria',
+    'Texas': 'Texas',
+    'warfarin': 'warfarin',
+    'Exusiai': 'Exusiai',
 }
 
 def sync_scripts_to_workspaces():
@@ -230,7 +230,7 @@ def deploy_soul_files():
             ws_dst.write_text(src_text, encoding='utf-8')
             deployed += 1
         # 太子兼容：同步一份到 legacy main agent 目录
-        if runtime_id == 'taizi':
+        if runtime_id == 'amiya':
             ag_dst = pathlib.Path.home() / '.openclaw/agents/main/SOUL.md'
             ag_dst.parent.mkdir(parents=True, exist_ok=True)
             try:
