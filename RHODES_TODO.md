@@ -10,8 +10,8 @@
   - [x] scripts/skill_manager.py ✅
   - [x] 其他 scripts/ 下的文件检查 ✅
 
-- [ ] 第三阶段：需要修改的看板 UI
-  - [ ] dashboard/dashboard.html
+- [x] 第三阶段：需要修改的看板 UI ✅
+  - [x] dashboard/dashboard.html ✅
 
 - [x] 第四阶段：需要创建的文档 ✅
   - [x] README_RHODES.md ✅
